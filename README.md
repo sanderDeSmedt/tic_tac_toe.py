@@ -18,14 +18,14 @@ Replay Option: Play multiple games without restarting the program
 
 Run the program:
 
-bash   python tictactoe.py
+    python3 tictactoe.py
 
 Choose whether you want to be X or O
 Select your difficulty level:
 
-1 for Easy
-2 for Medium
-3 for Hard
+- 1 for Easy
+- 2 for Medium
+- 3 for Hard
 
 
 The game will randomly decide who goes first
