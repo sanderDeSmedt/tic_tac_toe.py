@@ -50,13 +50,7 @@ def playAgain():
 
 def MakeMove(board,letter,move):
     board[move] = letter
-'''
-def placeTaken(board,i):
-    if board[i] == '':
-        return False
-    else:
-        return True
-'''
+
 def isWinnerHorizontal(board,letter):
     #this function checks if there is a winner horizontally
     if ((board[7] == letter and board[8] == letter and board[9] == letter) or
@@ -157,20 +151,6 @@ def getComputerMove(board,computerLetter):
     move = chooseRandomMoveFromList(board, [1,3,7,9])
     if move != 0:
         return move
-
-    #while i <= 4:
-        #move = chooseRandomMoveFromList(board,[1,3,7,9])
-        #if isSpaceFree(board, move):
-            #return move
-        #else:
-            #i += 1
-
-        #copy = getBoardCopy(originalBoard)
-        #MakeMove(board,computerLetter,move)
-        #if isFullDiagonal(copy, computerLetter):
-        #    i +=1
-        #else:
-        #    return move
     #Choose random on the sides
     return chooseRandomMoveFromList(board,[2,4,6,8])
 
