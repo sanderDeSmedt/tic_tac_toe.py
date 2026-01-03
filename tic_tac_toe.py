@@ -2,6 +2,9 @@
 
 import random
 
+from sympy import false
+
+
 def DrawBoard(board):
     # This function prints out the board that it was passed.
     # "board" is a list of 10 strings representing the board (ignore index 0)
@@ -91,7 +94,7 @@ def getBoardCopy(board):
     return dupeBoard
 
 def isSpaceFree(board,move):
-    #retuns wether or not the given position is free
+    #retuns whether or not the given position is free
     if not board[move] == 'X' and not board[move] == 'O':
         return True
     else:
@@ -112,7 +115,7 @@ def chooseRandomMoveFromList(board,moveList):
     if len(possibleMoves) != 0:
         return random.choice(possibleMoves)
     else:
-        return "No moves found"
+        return 0
 
 def isFullDiagonal(board, computerLetter):
     for i in range(1,10):
@@ -151,12 +154,16 @@ def getComputerMove(board,computerLetter):
     #if the center is not free the computer will choose one of the corners
     i = 1
     #originalBoard = board
-    while i <= 4:
-        move = chooseRandomMoveFromList(board,[1,3,7,9])
-        if isSpaceFree(board, move):
-            return move
-        else:
-            i += 1
+    move = chooseRandomMoveFromList(board, [1,3,7,9])
+    if move != 0:
+        return move
+
+    #while i <= 4:
+        #move = chooseRandomMoveFromList(board,[1,3,7,9])
+        #if isSpaceFree(board, move):
+            #return move
+        #else:
+            #i += 1
 
         #copy = getBoardCopy(originalBoard)
         #MakeMove(board,computerLetter,move)
@@ -164,16 +171,16 @@ def getComputerMove(board,computerLetter):
         #    i +=1
         #else:
         #    return move
-    #Choose on on the sides
+    #Choose random on the sides
     return chooseRandomMoveFromList(board,[2,4,6,8])
 
 def isBoardFull(board):
     #returns True if all the positions are taken els returns False
-    for i in range(len(board)):
+    for i in range(1,10):
         if isSpaceFree(board,i):
-            return False
-        else:
-            return True
+            return false
+
+    return True
 
 def goodMove(board, playerletter,next):
     good_move = True
@@ -212,14 +219,22 @@ def ticTacToe():
                         break
                     turn = 'computer'
 
-            else:
-                #computer's move
-                move = getComputerMove(theBoard,computerLetter)
 
+            else:
+                # computer's move
+                move = getComputerMove(theBoard, computerLetter)
                 if isSpaceFree(theBoard, move):
                     MakeMove(theBoard, computerLetter, move)
-                DrawBoard(theBoard)
-                goodMove(theBoard, computerLetter, 'player')
+                if isWinner(theBoard, computerLetter):
+                    DrawBoard(theBoard)
+                    print('The computer has beaten you, you lost!')
+                    gameIsPlaying = False
+                else:
+                    if isBoardFull(theBoard):
+                        DrawBoard(theBoard)
+                        print('the game is a tie!')
+                        break
+                    turn = 'player'
                 """
                 good_move = True
                 while good_move:
