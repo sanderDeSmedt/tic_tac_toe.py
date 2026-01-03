@@ -1,8 +1,8 @@
-#Tic Tac Toe
+# Tic Tac Toe
 A Python implementation of the classic Tic Tac Toe game with three difficulty levels, featuring AI opponents ranging from random moves to an unbeatable minimax algorithm.
 Features
 
-#Three Difficulty Levels
+## Three Difficulty Levels
 
 Easy: Computer makes random moves
 Medium: Strategic AI that tries to win, blocks your moves, and follows tactical patterns
@@ -14,7 +14,7 @@ Random Turn Order: Either you or the computer can go first
 Clean Board Display: Clear visual representation of the game board
 Replay Option: Play multiple games without restarting the program
 
-#How to Play
+## How to Play
 
 Run the program:
 
@@ -39,7 +39,7 @@ Enter your move by typing a number from 1-9 corresponding to the board position:
 
 Try to get three in a row (horizontally, vertically, or diagonally) before the computer does!
 
-#Difficulty Breakdown
+## Difficulty Breakdown
 Easy Mode
 The computer selects moves completely at random from available spaces. Great for beginners or young players who want a fair chance to win.
 Medium Mode
@@ -53,12 +53,13 @@ Provides a good challenge for intermediate players
 
 Hard Mode
 The computer uses the minimax algorithm to evaluate all possible future game states. It plays perfectly and cannot be beaten - you can only hope for a tie. Perfect for experienced players who want the ultimate challenge.
-Requirements
+
+## equirements
 
 Python 3.x
 No external libraries required (uses only standard Python libraries)
 
-Game Rules
+## Game Rules
 
 Players alternate turns placing their mark (X or O) on the board
 The first player to get three marks in a row (horizontally, vertically, or diagonally) wins
