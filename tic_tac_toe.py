@@ -2,11 +2,6 @@ import random
 import tkinter as tk
 from tkinter import messagebox
 
-
-# ==========================================
-# AI LOGIC (Your Core Mechanics)
-# ==========================================
-
 def isSpaceFree(board, move):
     return board[move] == ' '
 
