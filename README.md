@@ -57,7 +57,11 @@ The computer uses the minimax algorithm to evaluate all possible future game sta
 ## equirements
 
 Python 3.x
-No external libraries required (uses only standard Python libraries)
+tkinter library is needed for the GUI.
+
+## GUI
+
+With the last update also comes a GUI that makes it easier to play.
 
 ## Game Rules
 
