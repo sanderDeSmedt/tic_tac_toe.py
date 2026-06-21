@@ -1,49 +1,6 @@
 import random
-
-
-def DrawBoard(board):
-    print(" " + board[7] + " | " + board[8] + " | " + board[9])
-    print('----------')
-    print(" " + board[4] + " | " + board[5] + " | " + board[6])
-    print('----------')
-    print(" " + board[1] + " | " + board[2] + " | " + board[3])
-
-def inputPlayerLetter():
-    letter = " "
-    while not (letter == "X" or letter == "O"):
-        print("Do you want to be X or O?")
-        letter = input().upper()
-    if letter == "X":
-        return ['X', 'O']
-    else:
-        return ['O', 'X']
-
-def chooseDifficulty():
-    """Let the player choose the difficulty level"""
-    difficulty = ""
-    while difficulty not in ['1', '2', '3']:
-        print("\nChoose difficulty:")
-        print("1 - Easy (Random moves)")
-        print("2 - Medium (Smart strategy)")
-        print("3 - Hard (Unbeatable AI)")
-        difficulty = input("Enter 1, 2, or 3: ")
-    return int(difficulty)
-
-def WhoGoesFirst():
-    if random.randint(0, 1) == 0:
-        return 'computer'
-    else:
-        return 'player'
-
-
-def playAgain():
-    print("Do you want to play again (yes or no)")
-    answer = input().lower()
-    return answer.startswith('y')
-
-
-def MakeMove(board, letter, move):
-    board[move] = letter
+import tkinter as tk
+from tkinter import messagebox
 
 def isWinner(board, letter):
     return ((board[7] == letter and board[8] == letter and board[9] == letter) or  # top
@@ -55,6 +12,8 @@ def isWinner(board, letter):
             (board[7] == letter and board[5] == letter and board[3] == letter) or  # diagonal
             (board[1] == letter and board[5] == letter and board[9] == letter))  # diagonal
 
+def MakeMove(board, letter, move):
+    board[move] = letter
 
 def getBoardCopy(board):
     return board.copy()
@@ -79,85 +38,48 @@ def isBoardFull(board):
     return True
 
 def chooseRandomMoveFromList(board, moveList):
-    possibleMoves = []
-    for i in moveList:
-        if isSpaceFree(board, i):
-            possibleMoves.append(i)
-    if len(possibleMoves) != 0:
-        return random.choice(possibleMoves)
-    else:
-        return None
+    possibleMoves = [i for i in moveList if isSpaceFree(board, i)]
+    return random.choice(possibleMoves) if possibleMoves else None
 
 
-# EASY DIFFICULTY - Random moves
 def getComputerMoveEasy(board):
-    """Makes completely random moves"""
-    possibleMoves = []
-    for i in range(1, 10):
-        if isSpaceFree(board, i):
-            possibleMoves.append(i)
+    possibleMoves = [i for i in range(1, 10) if isSpaceFree(board, i)]
     return random.choice(possibleMoves)
 
 
-# MEDIUM DIFFICULTY - Original strategic logic
 def getComputerMoveMedium(board, computerLetter):
-    """Uses strategic rules: win, block, center, corners, sides"""
-    if computerLetter == 'X':
-        playerLetter = 'O'
-    else:
-        playerLetter = 'X'
+    playerLetter = 'O' if computerLetter == 'X' else 'X'
 
-    # Check if computer can win
     for i in range(1, 10):
-        copy = getBoardCopy(board)
         if isSpaceFree(board, i):
+            copy = getBoardCopy(board)
             MakeMove(copy, computerLetter, i)
-            if isWinner(copy, computerLetter):
-                return i
+            if isWinner(copy, computerLetter): return i
 
-    # Block player from winning
     for i in range(1, 10):
-        copy = getBoardCopy(board)
         if isSpaceFree(board, i):
+            copy = getBoardCopy(board)
             MakeMove(copy, playerLetter, i)
-            if isWinner(copy, playerLetter):
-                return i
+            if isWinner(copy, playerLetter): return i
 
-    # Take center if free
-    if isSpaceFree(board, 5):
-        return 5
-
-    # Take a corner
+    if isSpaceFree(board, 5): return 5
     move = chooseRandomMoveFromList(board, [1, 3, 7, 9])
-    if move is not None:
-        return move
-
-    # Take a side
+    if move is not None: return move
     return chooseRandomMoveFromList(board, [2, 4, 6, 8])
 
 
-# HARD DIFFICULTY - Minimax algorithm
 def evaluatePosition(board, computerLetter, playerLetter):
-    """Evaluates the board position and returns a score"""
-    if isWinner(board, computerLetter):
-        return 10
-    elif isWinner(board, playerLetter):
-        return -10
-    else:
-        return 0
+    if isWinner(board, computerLetter): return 10
+    if isWinner(board, playerLetter): return -10
+    return 0
 
 
 def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, beta):
     """Minimax algorithm to find the best move enhanced with alpha beta pruning"""
     score = evaluatePosition(board, computerLetter, playerLetter)
-
-    if score == 10:
-        return score - depth
-    if score == -10:
-        return score + depth
-
-    if isBoardFull(board):
-        return 0
+    if score == 10: return score - depth
+    if score == -10: return score + depth
+    if isBoardFull(board): return 0
 
     if isMaximizing:
         bestScore = -1000
@@ -190,7 +112,6 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, bet
 
 
 def getComputerMoveHard(board, computerLetter, playerLetter):
-    """Uses minimax algorithm to find the optimal move"""
     bestScore = -1000
     bestMove = None
 
@@ -203,71 +124,154 @@ def getComputerMoveHard(board, computerLetter, playerLetter):
             copy = getBoardCopy(board)
             MakeMove(copy, computerLetter, i)
             score = minimax(copy, 0, False, computerLetter, playerLetter, alpha, beta)
-
             if score > bestScore:
                 bestScore = score
                 bestMove = i
-
+            alpha = max(alpha, score)
     return bestMove
 
 
-def getComputerMove(board, computerLetter, playerLetter, difficulty):
-    """Routes to the appropriate AI based on difficulty"""
-    if difficulty == 1:
-        return getComputerMoveEasy(board)
-    elif difficulty == 2:
-        return getComputerMoveMedium(board, computerLetter)
-    else:  # difficulty == 3
-        return getComputerMoveHard(board, computerLetter, playerLetter)
+# ==========================================
+# GUI APPLICATION
+# ==========================================
+
+class TicTacToeGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Tic Tac Toe - Pro Edition")
+
+        # Game State Variables
+        self.board = [' '] * 10
+        self.playerLetter = 'X'
+        self.computerLetter = 'O'
+        self.difficulty = tk.IntVar(value=3)  # Default Hard
+        self.buttons = {}
+
+        self.setup_menu()
+
+    def setup_menu(self):
+        """Creates the initial configuration setup screen"""
+        self.frame = tk.Frame(self.root, padx=20, pady=20)
+        self.frame.pack()
+
+        tk.Label(self.frame, text="Welcome to Tic Tac Toe!", font=('Helvetica', 16, 'bold')).pack(pady=10)
+
+        # Difficulty Selection
+        tk.Label(self.frame, text="Choose Difficulty:", font=('Helvetica', 11)).pack(anchor='w')
+        tk.Radiobutton(self.frame, text="Easy (Random)", variable=self.difficulty, value=1).pack(anchor='w')
+        tk.Radiobutton(self.frame, text="Medium (Strategic)", variable=self.difficulty, value=2).pack(anchor='w')
+        tk.Radiobutton(self.frame, text="Hard (Unbeatable Minimax)", variable=self.difficulty, value=3).pack(anchor='w')
+
+        # Letter Selection
+        tk.Label(self.frame, text="\nChoose Your Side:", font=('Helvetica', 11)).pack(anchor='w')
+        self.side_var = tk.StringVar(value='X')
+        tk.Radiobutton(self.frame, text="Play as X", variable=self.side_var, value='X').pack(anchor='w')
+        tk.Radiobutton(self.frame, text="Play as O", variable=self.side_var, value='O').pack(anchor='w')
+
+        # Start Button
+        tk.Button(self.frame, text="Start Game", font=('Helvetica', 12, 'bold'),
+                  bg='#4CAF50', fg='white', command=self.start_game).pack(pady=20)
+
+    def start_game(self):
+        """Transitions from setup screen to the interactive board"""
+        self.playerLetter = self.side_var.get()
+        self.computerLetter = 'O' if self.playerLetter == 'X' else 'X'
+
+        # Clear menu screen
+        self.frame.destroy()
+
+        # Create game layout frame
+        self.game_frame = tk.Frame(self.root, bg='#222')
+        self.game_frame.pack()
+
+        # Map out the visual layout mimicking your numpad board scheme
+        # Row 1: 7, 8, 9 | Row 2: 4, 5, 6 | Row 3: 1, 2, 3
+        board_layout = [
+            [7, 8, 9],
+            [4, 5, 6],
+            [1, 2, 3]
+        ]
+
+        for r_idx, row in enumerate(board_layout):
+            for c_idx, num in enumerate(row):
+                btn = tk.Button(self.game_frame, text='', font=('Helvetica', 24, 'bold'),
+                                height=2, width=5, bg='#333', fg='white',
+                                activebackground='#555', activeforeground='white',
+                                command=lambda n=num: self.player_move(n))
+                btn.grid(row=r_idx, column=c_idx, padx=5, pady=5)
+                self.buttons[num] = btn
+
+        # Randomly choose who goes first
+        if random.randint(0, 1) == 0:
+            messagebox.showinfo("First Turn", "The Computer goes first!")
+            self.root.after(500, self.computer_move)
+        else:
+            messagebox.showinfo("First Turn", "You go first!")
+
+    def player_move(self, position):
+        """Triggered when a player clicks a board square"""
+        if isSpaceFree(self.board, position):
+            self.make_gui_move(self.playerLetter, position, '#2196F3')
+
+            if self.check_game_over(self.playerLetter, "Congrats, you won!"):
+                return
+
+            # Disable interaction while computer is thinking
+            self.toggle_buttons(state="disabled")
+            self.root.after(400, self.computer_move)
+
+    def computer_move(self):
+        """Calculates AI action and visualizes it"""
+        diff = self.difficulty.get()
+
+        if diff == 1:
+            move = getComputerMoveEasy(self.board)
+        elif diff == 2:
+            move = getComputerMoveMedium(self.board, self.computerLetter)
+        else:
+            move = getComputerMoveHard(self.board, self.computerLetter, self.playerLetter)
+
+        if move:
+            self.make_gui_move(self.computerLetter, move, '#f44336')
+            self.toggle_buttons(state="normal")
+            self.check_game_over(self.computerLetter, "The computer beat you!")
+
+    def make_gui_move(self, letter, position, bg_color):
+        """Updates internal structure array alongside external visual element"""
+        MakeMove(self.board, letter, position)
+        self.buttons[position].config(text=letter, bg=bg_color, state="disabled")
+
+    def toggle_buttons(self, state):
+        """Enables/Disables vacant board slots smoothly"""
+        for pos, btn in self.buttons.items():
+            if isSpaceFree(self.board, pos):
+                btn.config(state=state)
+
+    def check_game_over(self, letter, win_message):
+        """Inspects structural states and serves outcome notifications"""
+        if isWinner(self.board, letter):
+            messagebox.showinfo("Game Over", win_message)
+            self.prompt_restart()
+            return True
+        elif isBoardFull(self.board):
+            messagebox.showinfo("Game Over", "It's a tie!")
+            self.prompt_restart()
+            return True
+        return False
+
+    def prompt_restart(self):
+        """Offers a modern choice interface box to play again"""
+        if messagebox.askyesno("Play Again?", "Would you like to play another match?"):
+            self.game_frame.destroy()
+            self.board = [' '] * 10
+            self.buttons = {}
+            self.setup_menu()
+        else:
+            self.root.quit()
 
 
-def ticTacToe():
-    while True:
-        theBoard = [' '] * 10
-        playerLetter, computerLetter = inputPlayerLetter()
-        difficulty = chooseDifficulty()
-        turn = WhoGoesFirst()
-        print('The ' + turn + ' will go first.')
-        gameIsPlaying = True
-
-        while gameIsPlaying:
-            if turn == 'player':
-                DrawBoard(theBoard)
-                move = getPlayerMove(theBoard)
-                MakeMove(theBoard, playerLetter, move)
-
-                if isWinner(theBoard, playerLetter):
-                    DrawBoard(theBoard)
-                    print('Congrats you are the winner!')
-                    gameIsPlaying = False
-                else:
-                    if isBoardFull(theBoard):
-                        DrawBoard(theBoard)
-                        print('The game is a tie!')
-                        break
-                    turn = 'computer'
-
-            else:
-                # Computer's move based on difficulty
-                if difficulty == 3:
-                    print("Computer is thinking...")
-                move = getComputerMove(theBoard, computerLetter, playerLetter, difficulty)
-                MakeMove(theBoard, computerLetter, move)
-
-                if isWinner(theBoard, computerLetter):
-                    DrawBoard(theBoard)
-                    print('The computer has beaten you, you lost!')
-                    gameIsPlaying = False
-                else:
-                    if isBoardFull(theBoard):
-                        DrawBoard(theBoard)
-                        print('The game is a tie!')
-                        break
-                    turn = 'player'
-
-        if not playAgain():
-            print('See you soon again!')
-            break
-
-
-ticTacToe()
+# Run the app
+if __name__ == "__main__":
+    window = tk.Tk()
+    app = TicTacToeGUI(window)
+    window.mainloop()
