@@ -2,32 +2,40 @@ import random
 import tkinter as tk
 from tkinter import messagebox
 
-def isSpaceFree(board, move):
-    return board[move] == ' '
-
-
-def isBoardFull(board):
-    return ' ' not in board[1:10]
-
-
-def isWinner(b, l):
-    return ((b[7] == l and b[8] == l and b[9] == l) or
-            (b[4] == l and b[5] == l and b[6] == l) or
-            (b[1] == l and b[2] == l and b[3] == l) or
-            (b[7] == l and b[4] == l and b[1] == l) or
-            (b[8] == l and b[5] == l and b[2] == l) or
-            (b[9] == l and b[6] == l and b[3] == l) or
-            (b[7] == l and b[5] == l and b[3] == l) or
-            (b[1] == l and b[5] == l and b[9] == l))
-
-
-def getBoardCopy(board):
-    return board.copy()
-
+def isWinner(board, letter):
+    return ((board[7] == letter and board[8] == letter and board[9] == letter) or  # top
+            (board[4] == letter and board[5] == letter and board[6] == letter) or  # middle
+            (board[1] == letter and board[2] == letter and board[3] == letter) or  # bottom
+            (board[7] == letter and board[4] == letter and board[1] == letter) or  # left
+            (board[8] == letter and board[5] == letter and board[2] == letter) or  # center v
+            (board[9] == letter and board[6] == letter and board[3] == letter) or  # right
+            (board[7] == letter and board[5] == letter and board[3] == letter) or  # diagonal
+            (board[1] == letter and board[5] == letter and board[9] == letter))  # diagonal
 
 def MakeMove(board, letter, move):
     board[move] = letter
 
+def getBoardCopy(board):
+    return board.copy()
+
+def isSpaceFree(board, move):
+    if not board[move] == 'X' and not board[move] == 'O':
+        return True
+    else:
+        return False
+
+def getPlayerMove(board):
+    move = ' '
+    while move not in '1 2 3 4 5 6 7 8 9'.split() or not isSpaceFree(board, int(move)):
+        print('What is your next move(1-9)')
+        move = input()
+    return int(move)
+
+def isBoardFull(board):
+    for i in range(1, 10):
+        if isSpaceFree(board, i):
+            return False
+    return True
 
 def chooseRandomMoveFromList(board, moveList):
     possibleMoves = [i for i in moveList if isSpaceFree(board, i)]
@@ -67,6 +75,7 @@ def evaluatePosition(board, computerLetter, playerLetter):
 
 
 def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, beta):
+    """Minimax algorithm to find the best move enhanced with alpha beta pruning"""
     score = evaluatePosition(board, computerLetter, playerLetter)
     if score == 10: return score - depth
     if score == -10: return score + depth
@@ -80,8 +89,11 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, bet
                 MakeMove(copy, computerLetter, i)
                 score = minimax(copy, depth + 1, False, computerLetter, playerLetter, alpha, beta)
                 bestScore = max(score, bestScore)
+
+                # Update alpha and check for pruning
                 alpha = max(alpha, score)
-                if beta <= alpha: break
+                if beta <= alpha:
+                    break  # Beta cutoff (Prune this branch)
         return bestScore
     else:
         bestScore = 1000
@@ -91,15 +103,22 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, bet
                 MakeMove(copy, playerLetter, i)
                 score = minimax(copy, depth + 1, True, computerLetter, playerLetter, alpha, beta)
                 bestScore = min(score, bestScore)
+
+                # Update beta and check for pruning
                 beta = min(beta, score)
-                if beta <= alpha: break
+                if beta <= alpha:
+                    break  # Alpha cutoff (Prune this branch)
         return bestScore
 
 
 def getComputerMoveHard(board, computerLetter, playerLetter):
     bestScore = -1000
     bestMove = None
-    alpha, beta = -1000, 1000
+
+    # Initializing alpha and beta
+    alpha = -1000
+    beta= 1000
+
     for i in range(1, 10):
         if isSpaceFree(board, i):
             copy = getBoardCopy(board)
