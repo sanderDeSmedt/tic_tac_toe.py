@@ -54,7 +54,7 @@ Provides a good challenge for intermediate players
 Hard Mode
 The computer uses the minimax algorithm to evaluate all possible future game states. It plays perfectly and cannot be beaten - you can only hope for a tie. Perfect for experienced players who want the ultimate challenge.
 
-## equirements
+## Requirements
 
 Python 3.x
 tkinter library is needed for the GUI.
