@@ -45,43 +45,19 @@ def playAgain():
 def MakeMove(board, letter, move):
     board[move] = letter
 
-
-def isWinnerHorizontal(board, letter):
-    if ((board[7] == letter and board[8] == letter and board[9] == letter) or
-            (board[4] == letter and board[5] == letter and board[6] == letter) or
-            (board[1] == letter and board[2] == letter and board[3] == letter)):
-        return True
-    else:
-        return False
-
-def isWinnerVertical(board, letter):
-    if ((board[7] == letter and board[4] == letter and board[1] == letter) or
-            (board[8] == letter and board[5] == letter and board[2] == letter) or
-            (board[9] == letter and board[6] == letter and board[3] == letter)):
-        return True
-    else:
-        return False
-
-
-def isWinnerDiagonal(board, letter):
-    if ((board[7] == letter and board[5] == letter and board[3] == letter) or
-            (board[1] == letter and board[5] == letter and board[9] == letter)):
-        return True
-    else:
-        return False
-
 def isWinner(board, letter):
-    if isWinnerDiagonal(board, letter) or isWinnerHorizontal(board, letter) or isWinnerVertical(board, letter):
-        return True
-    else:
-        return False
+    return ((board[7] == letter and board[8] == letter and board[9] == letter) or  # top
+            (board[4] == letter and board[5] == letter and board[6] == letter) or  # middle
+            (board[1] == letter and board[2] == letter and board[3] == letter) or  # bottom
+            (board[7] == letter and board[4] == letter and board[1] == letter) or  # left
+            (board[8] == letter and board[5] == letter and board[2] == letter) or  # center v
+            (board[9] == letter and board[6] == letter and board[3] == letter) or  # right
+            (board[7] == letter and board[5] == letter and board[3] == letter) or  # diagonal
+            (board[1] == letter and board[5] == letter and board[9] == letter))  # diagonal
 
 
 def getBoardCopy(board):
-    dupeBoard = []
-    for i in range(len(board)):
-        dupeBoard.append(board[i])
-    return dupeBoard
+    return board.copy()
 
 def isSpaceFree(board, move):
     if not board[move] == 'X' and not board[move] == 'O':
@@ -171,8 +147,8 @@ def evaluatePosition(board, computerLetter, playerLetter):
         return 0
 
 
-def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
-    """Minimax algorithm to find the best move"""
+def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, beta):
+    """Minimax algorithm to find the best move enhanced with alpha beta pruning"""
     score = evaluatePosition(board, computerLetter, playerLetter)
 
     if score == 10:
@@ -189,8 +165,13 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
             if isSpaceFree(board, i):
                 copy = getBoardCopy(board)
                 MakeMove(copy, computerLetter, i)
-                score = minimax(copy, depth + 1, False, computerLetter, playerLetter)
+                score = minimax(copy, depth + 1, False, computerLetter, playerLetter, alpha, beta)
                 bestScore = max(score, bestScore)
+
+                # Update alpha and check for pruning
+                alpha = max(alpha, score)
+                if beta <= alpha:
+                    break  # Beta cutoff (Prune this branch)
         return bestScore
     else:
         bestScore = 1000
@@ -198,8 +179,13 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
             if isSpaceFree(board, i):
                 copy = getBoardCopy(board)
                 MakeMove(copy, playerLetter, i)
-                score = minimax(copy, depth + 1, True, computerLetter, playerLetter)
+                score = minimax(copy, depth + 1, True, computerLetter, playerLetter, alpha, beta)
                 bestScore = min(score, bestScore)
+
+                # Update beta and check for pruning
+                beta = min(beta, score)
+                if beta <= alpha:
+                    break  # Alpha cutoff (Prune this branch)
         return bestScore
 
 
@@ -208,11 +194,15 @@ def getComputerMoveHard(board, computerLetter, playerLetter):
     bestScore = -1000
     bestMove = None
 
+    # Initializing alpha and beta
+    alpha = -1000
+    beta= 1000
+
     for i in range(1, 10):
         if isSpaceFree(board, i):
             copy = getBoardCopy(board)
             MakeMove(copy, computerLetter, i)
-            score = minimax(copy, 0, False, computerLetter, playerLetter)
+            score = minimax(copy, 0, False, computerLetter, playerLetter, alpha, beta)
 
             if score > bestScore:
                 bestScore = score
