@@ -45,36 +45,15 @@ def playAgain():
 def MakeMove(board, letter, move):
     board[move] = letter
 
-
-def isWinnerHorizontal(board, letter):
-    if ((board[7] == letter and board[8] == letter and board[9] == letter) or
-            (board[4] == letter and board[5] == letter and board[6] == letter) or
-            (board[1] == letter and board[2] == letter and board[3] == letter)):
-        return True
-    else:
-        return False
-
-def isWinnerVertical(board, letter):
-    if ((board[7] == letter and board[4] == letter and board[1] == letter) or
-            (board[8] == letter and board[5] == letter and board[2] == letter) or
-            (board[9] == letter and board[6] == letter and board[3] == letter)):
-        return True
-    else:
-        return False
-
-
-def isWinnerDiagonal(board, letter):
-    if ((board[7] == letter and board[5] == letter and board[3] == letter) or
-            (board[1] == letter and board[5] == letter and board[9] == letter)):
-        return True
-    else:
-        return False
-
 def isWinner(board, letter):
-    if isWinnerDiagonal(board, letter) or isWinnerHorizontal(board, letter) or isWinnerVertical(board, letter):
-        return True
-    else:
-        return False
+    return ((board[7] == letter and board[8] == letter and board[9] == letter) or  # top
+            (board[4] == letter and board[5] == letter and board[6] == letter) or  # middle
+            (board[1] == letter and board[2] == letter and board[3] == letter) or  # bottom
+            (board[7] == letter and board[4] == letter and board[1] == letter) or  # left
+            (board[8] == letter and board[5] == letter and board[2] == letter) or  # center v
+            (board[9] == letter and board[6] == letter and board[3] == letter) or  # right
+            (board[7] == letter and board[5] == letter and board[3] == letter) or  # diagonal
+            (board[1] == letter and board[5] == letter and board[9] == letter))  # diagonal
 
 
 def getBoardCopy(board):
