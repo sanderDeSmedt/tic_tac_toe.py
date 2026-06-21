@@ -78,10 +78,7 @@ def isWinner(board, letter):
 
 
 def getBoardCopy(board):
-    dupeBoard = []
-    for i in range(len(board)):
-        dupeBoard.append(board[i])
-    return dupeBoard
+    return board.copy()
 
 def isSpaceFree(board, move):
     if not board[move] == 'X' and not board[move] == 'O':
