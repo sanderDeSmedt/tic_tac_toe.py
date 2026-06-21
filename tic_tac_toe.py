@@ -147,8 +147,8 @@ def evaluatePosition(board, computerLetter, playerLetter):
         return 0
 
 
-def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
-    """Minimax algorithm to find the best move"""
+def minimax(board, depth, isMaximizing, computerLetter, playerLetter, alpha, beta):
+    """Minimax algorithm to find the best move enhanced with alpha beta pruning"""
     score = evaluatePosition(board, computerLetter, playerLetter)
 
     if score == 10:
@@ -165,8 +165,13 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
             if isSpaceFree(board, i):
                 copy = getBoardCopy(board)
                 MakeMove(copy, computerLetter, i)
-                score = minimax(copy, depth + 1, False, computerLetter, playerLetter)
+                score = minimax(copy, depth + 1, False, computerLetter, playerLetter, alpha, beta)
                 bestScore = max(score, bestScore)
+
+                # Update alpha and check for pruning
+                alpha = max(alpha, score)
+                if beta <= alpha:
+                    break  # Beta cutoff (Prune this branch)
         return bestScore
     else:
         bestScore = 1000
@@ -174,8 +179,13 @@ def minimax(board, depth, isMaximizing, computerLetter, playerLetter):
             if isSpaceFree(board, i):
                 copy = getBoardCopy(board)
                 MakeMove(copy, playerLetter, i)
-                score = minimax(copy, depth + 1, True, computerLetter, playerLetter)
+                score = minimax(copy, depth + 1, True, computerLetter, playerLetter, alpha, beta)
                 bestScore = min(score, bestScore)
+
+                # Update beta and check for pruning
+                beta = min(beta, score)
+                if beta <= alpha:
+                    break  # Alpha cutoff (Prune this branch)
         return bestScore
 
 
@@ -184,11 +194,15 @@ def getComputerMoveHard(board, computerLetter, playerLetter):
     bestScore = -1000
     bestMove = None
 
+    # Initializing alpha and beta
+    alpha = -1000
+    beta= 1000
+
     for i in range(1, 10):
         if isSpaceFree(board, i):
             copy = getBoardCopy(board)
             MakeMove(copy, computerLetter, i)
-            score = minimax(copy, 0, False, computerLetter, playerLetter)
+            score = minimax(copy, 0, False, computerLetter, playerLetter, alpha, beta)
 
             if score > bestScore:
                 bestScore = score
