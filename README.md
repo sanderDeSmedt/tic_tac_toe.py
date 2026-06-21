@@ -56,7 +56,7 @@ The computer uses the minimax algorithm to evaluate all possible future game sta
 
 ## Requirements
 
-Python 3.x
+Python 3.x 
 tkinter library is needed for the GUI.
 
 ## GUI
